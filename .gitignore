@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Rider / JetBrains
+.idea/
+
+## SQLite database (auto-created and seeded on startup — do not commit)
+*.db
+*.db-shm
+*.db-wal
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Claude Code local settings
+.claude/
+
+## Publish output
+publish/

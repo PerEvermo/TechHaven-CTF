@@ -1,0 +1,56 @@
+@page "/admin"
+@rendermode InteractiveServer
+@inject AuthStateService Auth
+@inject NavigationManager Nav
+
+<PageTitle>Admin Panel — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    @if (!Auth.IsAdmin)
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="display-1 text-danger mb-3">&#x26D4;</div>
+                <h2 class="fw-bold">Access Denied</h2>
+                <p class="text-muted">You must be logged in as an administrator to view this page.</p>
+                <a href="/login" class="btn btn-primary mt-2">Go to Login</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="admin-panel">
+            <h4>&#x25A0; TechHaven Admin Console v1.0</h4>
+            <hr style="border-color:#00ff41;" />
+
+            <p>> Session authenticated: <strong>@Auth.LoggedInUser</strong> (@Auth.LoggedInRole)</p>
+            <p>> Access level: <strong>ADMIN</strong></p>
+            <p>> SQL injection bypass: <strong>DETECTED</strong></p>
+            <br />
+            <p>> Retrieving classified record...</p>
+            <br />
+
+            <p class="mb-1">FLAG 6 captured:</p>
+            <div class="flag-box">FLAG6: SQLINJECT_06</div>
+
+            <br />
+            <p class="text-muted" style="font-size:0.85rem;">
+                > Hint: There is one more flag hidden deeper in the database.<br />
+                > The products search endpoint may be worth investigating further.
+            </p>
+        </div>
+
+        <div class="mt-4">
+            <h5>Internal User Database</h5>
+            <table class="table table-bordered table-sm">
+                <thead class="table-dark">
+                    <tr><th>ID</th><th>Username</th><th>Role</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>johndoe</td><td>user</td></tr>
+                    <tr><td>2</td><td>admin</td><td>admin</td></tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

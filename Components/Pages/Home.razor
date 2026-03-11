@@ -1,0 +1,101 @@
+@page "/"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<PageTitle>TechHaven Electronics — Powering Your World</PageTitle>
+
+<!--
+    TechHaven Dev Notes — build 2.3.1
+    RkxBRzE6IFJFQ09OXzAx
+-->
+
+<div class="hero">
+    <div class="container text-center">
+        <h1><span class="text-warning">Tech</span>Haven Electronics</h1>
+        <p class="mt-3">Premium tech hardware, delivered to your door.</p>
+        <a href="/products" class="btn btn-warning btn-lg mt-3 px-5">Shop Now</a>
+    </div>
+</div>
+
+<div class="container py-5">
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <div class="fs-1 mb-2">&#x1F69A;</div>
+                <h5>Free Shipping</h5>
+                <p class="text-muted mb-0">On all orders over 500 kr</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <div class="fs-1 mb-2">&#x1F6E1;&#xFE0F;</div>
+                <h5>2-Year Warranty</h5>
+                <p class="text-muted mb-0">All products fully covered</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <div class="fs-1 mb-2">&#x1F4DE;</div>
+                <h5>24/7 Support</h5>
+                <p class="text-muted mb-0">Expert help when you need it</p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="fw-bold mb-4">Featured Products</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card product-card border-0 shadow-sm">
+                <div class="card-body">
+                    <span class="badge bg-primary category-badge mb-2">Laptops</span>
+                    <h5 class="card-title">Laptop Pro X1</h5>
+                    <p class="card-text text-muted">Intel Core i9, 32GB RAM, 1TB SSD. The ultimate work machine.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="price-tag">999,99 kr</span>
+                        <a href="/products" class="btn btn-outline-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card product-card border-0 shadow-sm">
+                <div class="card-body">
+                    <span class="badge bg-success category-badge mb-2">Audio</span>
+                    <h5 class="card-title">Wireless Headphones</h5>
+                    <p class="card-text text-muted">Active noise cancellation, 40-hour battery, premium sound.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="price-tag">199,99 kr</span>
+                        <a href="/products" class="btn btn-outline-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card product-card border-0 shadow-sm">
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark category-badge mb-2">Monitors</span>
+                    <h5 class="card-title">4K Monitor 27"</h5>
+                    <p class="card-text text-muted">IPS, 144Hz, HDR400. Crystal clear visuals for pros.</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="price-tag">449,99 kr</span>
+                        <a href="/products" class="btn btn-outline-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // FLAG 1: RECON_01
+            // Base64 string below decodes to: "FLAG1: RECON_01"
+            await JS.InvokeVoidAsync("printDebugBanner", "RkxBRzE6IFJFQ09OXzAx");
+            await JS.InvokeVoidAsync("setCookie", "customer_tier", "standard", 7);
+        }
+    }
+}

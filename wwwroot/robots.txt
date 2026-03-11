@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin
+Disallow: /hidden-warehouse
+Disallow: /vip
+
+# Sitemap: https://techhaven.local/sitemap.xml

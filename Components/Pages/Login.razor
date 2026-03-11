@@ -1,0 +1,80 @@
+@page "/login"
+@rendermode InteractiveServer
+@inject DatabaseService Db
+@inject AuthStateService Auth
+@inject NavigationManager Nav
+
+<PageTitle>Member Login — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-1">Member Login</h3>
+                    <p class="text-muted mb-4">Access your TechHaven account.</p>
+
+                    @if (errorMessage is not null)
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input @bind="username" class="form-control" placeholder="Enter username" autocomplete="username" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Password</label>
+                        <input @bind="password" type="password" class="form-control" placeholder="Enter password" autocomplete="current-password" />
+                    </div>
+
+                    <button class="btn btn-primary w-100" @onclick="DoLogin">Sign In</button>
+
+                    <hr class="my-4" />
+                    <p class="text-muted small mb-0">
+                        Don't have an account? <a href="#">Register here</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="ctf-hint mt-3">
+                <strong>Security Note:</strong> This login form connects to a backend database.
+                Always validate and sanitise user input on the server side.
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string? errorMessage;
+
+    private void DoLogin()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Please enter both username and password.";
+            return;
+        }
+
+        // VULNERABLE: passes raw input directly to SQL string concatenation
+        // Try: username = admin' --
+        //      username = ' OR '1'='1' --   password = anything
+        var (success, user, role) = Db.LoginVulnerable(username, password);
+
+        if (success)
+        {
+            Auth.IsAdmin = role == "admin" || username.Contains("'"); // injection path also grants admin
+            Auth.LoggedInUser = user;
+            Auth.LoggedInRole = role;
+            Nav.NavigateTo("/admin");
+        }
+        else
+        {
+            errorMessage = "Invalid username or password.";
+        }
+    }
+}

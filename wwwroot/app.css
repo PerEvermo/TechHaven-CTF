@@ -1,0 +1,121 @@
+/* TechHaven Electronics — global styles */
+
+html, body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* ---- Hero Banner ---- */
+.hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: white;
+    padding: 80px 0;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: #adb5bd;
+}
+
+/* ---- Product Cards ---- */
+.product-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.price-tag {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.category-badge {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ---- Search Bar ---- */
+.search-section {
+    background: white;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.5rem 0;
+}
+
+/* ---- VIP Banner ---- */
+.vip-banner {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    color: #1a1a1a;
+}
+
+/* ---- Admin Panel ---- */
+.admin-panel {
+    background: #1a1a2e;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.flag-box {
+    background: #0a0a1a;
+    border: 1px solid #00ff41;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    word-break: break-all;
+}
+
+/* ---- Scoreboard ---- */
+.scoreboard-table th {
+    background-color: #212529;
+    color: white;
+}
+
+/* ---- Hint boxes ---- */
+.ctf-hint {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 0.75rem 1rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.9rem;
+}
+
+/* ---- Footer ---- */
+.footer {
+    border-top: 1px solid #343a40;
+}
+
+/* ---- Error UI ---- */
+#blazor-error-ui {
+    background: #fff3cd;
+    border-top: 1px solid #ffc107;
+    bottom: 0;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

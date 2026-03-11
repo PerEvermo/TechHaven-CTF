@@ -1,0 +1,64 @@
+@page "/vip"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<PageTitle>VIP Lounge — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            @if (tierValue == "vip")
+            {
+                <div class="vip-banner text-center mb-4">
+                    <div class="fs-1 mb-2">&#x1F451;</div>
+                    <h2 class="fw-bold">Welcome to the VIP Lounge</h2>
+                    <p class="mb-3">You've unlocked exclusive member benefits.</p>
+                    <div class="bg-white rounded p-3 d-inline-block shadow-sm">
+                        <strong>FLAG5: COOKIE_05</strong>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold">&#x2B50; VIP Exclusive Deals</h5>
+                    <ul class="list-group list-group-flush mt-2">
+                        <li class="list-group-item">30% off all Laptops this week</li>
+                        <li class="list-group-item">Free express shipping on any order</li>
+                        <li class="list-group-item">Early access to new product releases</li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="display-1 mb-3">&#x1F512;</div>
+                    <h2 class="fw-bold">VIP Members Only</h2>
+                    <p class="text-muted">
+                        This area is reserved for TechHaven VIP members.<br />
+                        Upgrade your account to gain access.
+                    </p>
+                    <a href="#" class="btn btn-warning btn-lg mt-3 disabled">Upgrade to VIP</a>
+
+                    <div class="ctf-hint mt-4 text-start">
+                        <strong>Hint:</strong> Your membership tier is stored in your browser.
+                        Take a look at what cookies this site sets — maybe you can upgrade yourself.
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? tierValue;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            tierValue = await JS.InvokeAsync<string?>("getCookie", "customer_tier");
+            StateHasChanged();
+        }
+    }
+}

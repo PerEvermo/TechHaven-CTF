@@ -1,0 +1,139 @@
+@page "/scoreboard"
+@rendermode InteractiveServer
+@inject FlagService Flags
+
+<PageTitle>Scoreboard — TechHaven CTF</PageTitle>
+
+<div class="container py-5">
+    <div class="row">
+
+        <div class="col-lg-5 mb-5">
+            <h2 class="fw-bold mb-1">Submit a Flag</h2>
+            <p class="text-muted mb-4">Found something? Enter your team name and the flag value below.</p>
+
+            @if (submitMessage is not null)
+            {
+                <div class="alert @(lastSubmitOk ? "alert-success" : "alert-danger")">
+                    @submitMessage
+                </div>
+            }
+
+            <div class="card shadow-sm border-0 p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Team / Student Name</label>
+                    <input @bind="teamName" class="form-control" placeholder="e.g. Team Rocket" />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Flag Value</label>
+                    <input @bind="flagValue" class="form-control font-monospace" placeholder="e.g. RECON_01" />
+                </div>
+                <button class="btn btn-primary w-100" @onclick="Submit">Submit Flag</button>
+            </div>
+
+            <div class="ctf-hint mt-4">
+                <strong>There are @FlagService.TotalFlags flags</strong> hidden across this site.<br />
+                Some require source inspection, some require devtools, and some require attacking the application itself.
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="fw-bold mb-0">Leaderboard</h2>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="Refresh">&#x21BA; Refresh</button>
+            </div>
+
+            @if (submissions.Count == 0)
+            {
+                <div class="text-center text-muted py-5">
+                    <div class="fs-1 mb-2">&#x1F3C6;</div>
+                    <p>No flags submitted yet. Be the first!</p>
+                </div>
+            }
+            else
+            {
+                var grouped = submissions
+                    .GroupBy(s => s.TeamName)
+                    .Select(g => new { Team = g.Key, Flags = g.OrderBy(x => x.SubmittedAt).ToList(), Count = g.Count() })
+                    .OrderByDescending(x => x.Count)
+                    .ThenBy(x => x.Flags.Last().SubmittedAt)
+                    .ToList();
+
+                <table class="table scoreboard-table shadow-sm">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Team</th>
+                            <th>Flags Found</th>
+                            <th>Last Capture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < grouped.Count; i++)
+                        {
+                            var entry = grouped[i];
+                            var rank = i + 1;
+                            <tr>
+                                <td>
+                                    @if (rank == 1) { <span>&#x1F947;</span> }
+                                    else if (rank == 2) { <span>&#x1F948;</span> }
+                                    else if (rank == 3) { <span>&#x1F949;</span> }
+                                    else { <span class="text-muted">@rank</span> }
+                                </td>
+                                <td class="fw-semibold">@entry.Team</td>
+                                <td>
+                                    @foreach (var f in entry.Flags)
+                                    {
+                                        <span class="badge bg-success me-1">@f.FlagValue</span>
+                                    }
+                                    <span class="text-muted small">(@entry.Count / @FlagService.TotalFlags)</span>
+                                </td>
+                                <td class="text-muted small">@entry.Flags.Last().SubmittedAt.ToString("HH:mm:ss")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string teamName = "";
+    private string flagValue = "";
+    private string? submitMessage;
+    private bool lastSubmitOk;
+    private List<SubmissionResult> submissions = new();
+
+    protected override void OnInitialized() => submissions = Flags.GetLeaderboard();
+
+    private void Submit()
+    {
+        submitMessage = null;
+
+        if (string.IsNullOrWhiteSpace(teamName) || string.IsNullOrWhiteSpace(flagValue))
+        {
+            submitMessage = "Please fill in both fields.";
+            lastSubmitOk = false;
+            return;
+        }
+
+        var (isValid, description) = Flags.Validate(flagValue);
+
+        if (isValid)
+        {
+            Flags.Submit(teamName, flagValue);
+            submitMessage = $"Correct! \"{description}\" — flag captured!";
+            lastSubmitOk = true;
+            flagValue = "";
+            submissions = Flags.GetLeaderboard();
+        }
+        else
+        {
+            Flags.Submit(teamName, flagValue); // log incorrect attempts too
+            submitMessage = "Incorrect flag. Keep looking!";
+            lastSubmitOk = false;
+        }
+    }
+
+    private void Refresh() => submissions = Flags.GetLeaderboard();
+}

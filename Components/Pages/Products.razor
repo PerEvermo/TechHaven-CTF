@@ -1,0 +1,148 @@
+@page "/products"
+@rendermode InteractiveServer
+@inject DatabaseService Db
+
+<PageTitle>Products — TechHaven Electronics</PageTitle>
+
+<div class="search-section">
+    <div class="container">
+        <div class="row align-items-center g-2">
+            <div class="col-md-8">
+                <input @bind="searchTerm"
+                       @bind:event="oninput"
+                       @onkeydown="HandleKeyDown"
+                       class="form-control form-control-lg"
+                       placeholder="Search products…"
+                       autocomplete="off" />
+                <!-- TODO: sanitize search input before passing to DB query -->
+                <!-- Debug: query = SELECT id, name, description, price, category FROM products WHERE name LIKE '%query%' -->
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-lg w-100" @onclick="Search">Search</button>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary btn-lg w-100" @onclick="Reset">Reset</button>
+            </div>
+        </div>
+        @if (errorMessage is not null)
+        {
+            <div class="alert alert-danger mt-2 mb-0 py-2">@errorMessage</div>
+        }
+    </div>
+</div>
+
+<div class="container py-4">
+    @if (isSearching)
+    {
+        <p class="text-muted">Searching for "<strong>@lastSearch</strong>"…</p>
+    }
+
+    @if (products.Count == 0 && lastSearch is not null)
+    {
+        <div class="alert alert-info">No products found for "<strong>@lastSearch</strong>".</div>
+    }
+    else
+    {
+        @if (lastSearch is not null)
+        {
+            <p class="text-muted mb-3">@products.Count result(s) for "<strong>@lastSearch</strong>"</p>
+        }
+
+        <div class="row g-4">
+            @foreach (var p in products)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="card product-card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-secondary category-badge mb-2 align-self-start">@p.Category</span>
+                            <h5 class="card-title">@p.Name</h5>
+                            <p class="card-text text-muted flex-grow-1">@p.Description</p>
+                            <div class="mt-3">
+                                <span class="price-tag">@p.Price.ToString("N2") kr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (lastSearch is null)
+    {
+        <div class="row g-4">
+            @foreach (var p in allProducts)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="card product-card border-0 shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-secondary category-badge mb-2 align-self-start">@p.Category</span>
+                            <h5 class="card-title">@p.Name</h5>
+                            <p class="card-text text-muted flex-grow-1">@p.Description</p>
+                            <div class="mt-3">
+                                <span class="price-tag">@p.Price.ToString("N2") kr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* FLAG 2: hidden div — discoverable via DevTools or View Page Source *@
+        <div id="__debug" style="display:none;" aria-hidden="true">RkxBRzI6IFNIQURPV18wMg==</div>
+    }
+</div>
+
+@code {
+    private string searchTerm = "";
+    private string? lastSearch;
+    private bool isSearching;
+    private string? errorMessage;
+    private List<ProductResult> products = new();
+    private List<ProductResult> allProducts = new();
+
+    protected override void OnInitialized()
+    {
+        allProducts = Db.GetAllProducts();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Search();
+    }
+
+    private void Search()
+    {
+        errorMessage = null;
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            Reset();
+            return;
+        }
+
+        isSearching = true;
+        lastSearch = searchTerm;
+
+        try
+        {
+            products = Db.SearchProductsVulnerable(searchTerm);
+        }
+        catch (Exception ex)
+        {
+            // Intentionally leaks DB error — realistic misconfiguration
+            errorMessage = $"Database error: {ex.Message}";
+            products = new();
+        }
+        finally
+        {
+            isSearching = false;
+        }
+    }
+
+    private void Reset()
+    {
+        searchTerm = "";
+        lastSearch = null;
+        errorMessage = null;
+        products = new();
+    }
+}
