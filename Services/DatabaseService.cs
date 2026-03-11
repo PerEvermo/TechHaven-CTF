@@ -222,6 +222,53 @@ public class DatabaseService
         cmd.ExecuteNonQuery();
     }
 
+    public void ClearSubmissions()
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        conn.Open();
+        var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM submissions";
+        cmd.ExecuteNonQuery();
+    }
+
+    public InstructorStats GetStats()
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        conn.Open();
+
+        var cmd = conn.CreateCommand();
+
+        cmd.CommandText = "SELECT COUNT(*) FROM submissions";
+        var total = (long)cmd.ExecuteScalar()!;
+
+        cmd.CommandText = "SELECT COUNT(*) FROM submissions WHERE is_correct = 1";
+        var correct = (long)cmd.ExecuteScalar()!;
+
+        cmd.CommandText = "SELECT COUNT(DISTINCT team_name) FROM submissions";
+        var teams = (long)cmd.ExecuteScalar()!;
+
+        cmd.CommandText = """
+            SELECT flag_value, COUNT(DISTINCT team_name)
+            FROM submissions
+            WHERE is_correct = 1
+            GROUP BY flag_value
+            ORDER BY flag_value
+        """;
+
+        var perFlag = new Dictionary<string, int>();
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+            perFlag[reader.GetString(0)] = (int)reader.GetInt64(1);
+
+        return new InstructorStats
+        {
+            TotalSubmissions = (int)total,
+            CorrectSubmissions = (int)correct,
+            UniqueTeams = (int)teams,
+            CorrectPerFlag = perFlag,
+        };
+    }
+
     public List<SubmissionResult> GetCorrectSubmissions()
     {
         using var conn = new SqliteConnection(_connectionString);
@@ -256,6 +303,14 @@ public record ProductResult
     public string Description { get; init; } = "";
     public double Price { get; init; }
     public string Category { get; init; } = "";
+}
+
+public record InstructorStats
+{
+    public int TotalSubmissions { get; init; }
+    public int CorrectSubmissions { get; init; }
+    public int UniqueTeams { get; init; }
+    public Dictionary<string, int> CorrectPerFlag { get; init; } = new();
 }
 
 public record SubmissionResult

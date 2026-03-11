@@ -368,10 +368,30 @@ cmd.CommandText = $"SELECT id, name, description, price, category FROM products 
 
 ---
 
+## Instructor Panel
+
+A password-protected instructor page is available at `/instructor` (not linked anywhere in the UI).
+
+It shows:
+- Live stats: teams active, flags captured, wrong attempts
+- Per-flag progress bars showing how many teams found each flag
+- A **Clear all submissions** button with confirmation (for resetting between sessions)
+
+**Default password:** `TechHaven2026!`
+
+To change it, edit `appsettings.json`:
+```json
+"InstructorPassword": "YourNewPassword"
+```
+
+---
+
 ## Resetting Between Sessions
 
-To wipe all student submissions and start fresh:
+**Option A — Instructor panel (recommended):**
+Browse to `/instructor`, log in, click *Clear all submissions*.
 
+**Option B — Delete the database:**
 ```bash
 # Stop the app, then:
 del bin\Debug\net10.0\techhaven.db   # Windows

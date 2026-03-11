@@ -1,0 +1,173 @@
+@page "/instructor"
+@rendermode InteractiveServer
+@inject DatabaseService Db
+@inject FlagService Flags
+@inject IConfiguration Config
+
+<PageTitle>Instructor Panel — TechHaven</PageTitle>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            @if (!authenticated)
+            {
+                <div class="card shadow border-0 p-4">
+                    <h3 class="fw-bold mb-1">Instructor Access</h3>
+                    <p class="text-muted mb-4">Not visible to students.</p>
+
+                    @if (loginError)
+                    {
+                        <div class="alert alert-danger py-2">Incorrect password.</div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input @bind="password" type="password" class="form-control"
+                               placeholder="Instructor password" @onkeydown="HandleKey" />
+                    </div>
+                    <button class="btn btn-dark w-100" @onclick="Login">Sign In</button>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0">Instructor Panel</h3>
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="Refresh">&#x21BA; Refresh</button>
+                </div>
+
+                @* ---- Stats cards ---- *@
+                <div class="row g-3 mb-4">
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <div class="fs-2 fw-bold text-primary">@stats.UniqueTeams</div>
+                            <div class="text-muted small">Teams active</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <div class="fs-2 fw-bold text-success">@stats.CorrectSubmissions</div>
+                            <div class="text-muted small">Flags captured</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <div class="fs-2 fw-bold text-danger">@(stats.TotalSubmissions - stats.CorrectSubmissions)</div>
+                            <div class="text-muted small">Wrong attempts</div>
+                        </div>
+                    </div>
+                </div>
+
+                @* ---- Per-flag progress ---- *@
+                <div class="card border-0 shadow-sm p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Flag Progress</h5>
+                    @foreach (var (value, label) in FlagLabels)
+                    {
+                        var found = stats.CorrectPerFlag.TryGetValue(value, out var count) ? count : 0;
+                        var pct = stats.UniqueTeams > 0 ? (int)((double)found / stats.UniqueTeams * 100) : 0;
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-semibold">@label</small>
+                                <small class="text-muted">@found / @stats.UniqueTeams team(s)</small>
+                            </div>
+                            <div class="progress" style="height:8px;">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width:@(pct)%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @* ---- Reset ---- *@
+                <div class="card border-danger border shadow-sm p-4">
+                    <h5 class="fw-bold text-danger mb-1">Reset Scoreboard</h5>
+                    <p class="text-muted small mb-3">
+                        Clears all submissions from the database. Use between workshop sessions.
+                        This cannot be undone.
+                    </p>
+
+                    @if (!confirmReset)
+                    {
+                        <button class="btn btn-outline-danger" @onclick="() => confirmReset = true">
+                            Clear all submissions&hellip;
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning py-2 mb-3">
+                            Are you sure? This will delete <strong>@stats.TotalSubmissions</strong> submission(s).
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger" @onclick="Reset">Yes, clear everything</button>
+                            <button class="btn btn-secondary" @onclick="() => confirmReset = false">Cancel</button>
+                        </div>
+                    }
+
+                    @if (resetDone)
+                    {
+                        <div class="alert alert-success mt-3 py-2 mb-0">Scoreboard cleared.</div>
+                    }
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private string password = "";
+    private bool authenticated;
+    private bool loginError;
+    private bool confirmReset;
+    private bool resetDone;
+    private InstructorStats stats = new();
+
+    private static readonly Dictionary<string, string> FlagLabels = new()
+    {
+        ["RECON_01"]     = "Flag 1 — Reconnaissance",
+        ["SHADOW_02"]    = "Flag 2 — Hidden Elements",
+        ["HEADER_03"]    = "Flag 3 — HTTP Headers",
+        ["WAREHOUSE_04"] = "Flag 4 — Robots.txt",
+        ["COOKIE_05"]    = "Flag 5 — Cookie Manipulation",
+        ["SQLINJECT_06"] = "Flag 6 — SQL Injection (Auth)",
+        ["UNION_07"]     = "Flag 7 — SQL Injection (UNION)",
+    };
+
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Login();
+    }
+
+    private void Login()
+    {
+        var correct = Config["InstructorPassword"] ?? "";
+        if (password == correct)
+        {
+            authenticated = true;
+            loginError = false;
+            LoadStats();
+        }
+        else
+        {
+            loginError = true;
+        }
+        password = "";
+    }
+
+    private void Refresh()
+    {
+        resetDone = false;
+        confirmReset = false;
+        LoadStats();
+    }
+
+    private void Reset()
+    {
+        Db.ClearSubmissions();
+        confirmReset = false;
+        resetDone = true;
+        LoadStats();
+    }
+
+    private void LoadStats() => stats = Db.GetStats();
+}
