@@ -25,7 +25,7 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Flag Value</label>
-                    <input @bind="flagValue" class="form-control font-monospace" placeholder="e.g. RECON_01" />
+                    <input @bind="flagValue" class="form-control font-monospace" placeholder="Enter flag value" />
                 </div>
                 <button class="btn btn-primary w-100" @onclick="Submit">Submit Flag</button>
             </div>
@@ -83,7 +83,7 @@
                                 <td>
                                     @foreach (var f in entry.Flags)
                                     {
-                                        <span class="badge bg-success me-1">@FlagService.GetFlagDescription(f.FlagValue).Split(" — ")[0]</span>
+                                        <span class="badge bg-success me-1">@FlagLabel(f.FlagValue)</span>
                                     }
                                     <span class="text-muted small">(@entry.Count / @FlagService.TotalFlags)</span>
                                 </td>
@@ -136,4 +136,16 @@
     }
 
     private void Refresh() => submissions = Flags.GetLeaderboard();
+
+    private static string FlagLabel(string flagValue) => flagValue switch
+    {
+        "RECON_01"     => "Flag 1",
+        "SHADOW_02"    => "Flag 2",
+        "HEADER_03"    => "Flag 3",
+        "WAREHOUSE_04" => "Flag 4",
+        "COOKIE_05"    => "Flag 5",
+        "SQLINJECT_06" => "Flag 6",
+        "UNION_07"     => "Flag 7",
+        _              => "Flag ?",
+    };
 }
