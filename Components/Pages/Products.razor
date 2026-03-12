@@ -35,6 +35,7 @@
 
     @* Category filter strip — also doubles as a CTF entry point via ?cat= URL parameter *@
     @* Debug: query = SELECT id, name, description, price, category FROM products WHERE category = 'cat' *@
+    @* Dev note: related tables on this page — products(id,name,description,price,category), secrets(id,secret_key,secret_value) *@
     <div class="mb-4 d-flex flex-wrap gap-2 align-items-center">
         <span class="text-muted small me-1">Filter by category:</span>
         @foreach (var cat in categories)
