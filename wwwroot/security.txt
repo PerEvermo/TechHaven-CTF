@@ -1,0 +1,11 @@
+Contact: security@techhaven.no
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: en, no
+Canonical: https://techhaven.local/security.txt
+
+# TechHaven Security Disclosure Policy
+# We welcome responsible disclosure of security vulnerabilities.
+# Please report issues to security@techhaven.no before public disclosure.
+
+# FLAG11: WELLKNOWN_11
+# If you found this file — good instinct. Security researchers always check /security.txt.

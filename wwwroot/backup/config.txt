@@ -1,0 +1,29 @@
+# TechHaven Internal Configuration Backup
+# Generated: 2026-01-15 03:12:44 UTC
+# WARNING: This file contains sensitive credentials. DO NOT expose publicly.
+# TODO: Move to secrets manager before next release
+
+[database]
+connection_string = sqlite://./techhaven.db
+max_pool_size = 10
+timeout_seconds = 30
+
+[api]
+internal_api_key = th-internal-4829af
+rate_limit = 100/min
+cors_origins = https://techhaven.no,https://www.techhaven.no
+
+[smtp]
+host = mail.techhaven.no
+port = 587
+username = noreply@techhaven.no
+password = Smtp@2024!
+
+[debug]
+log_level = INFO
+error_detail = false
+admin_contact = it@techhaven.no
+
+# FLAG14: BACKUP_14
+# You found our backup configuration file via forced browsing.
+# In a real scenario, this file would expose real credentials.

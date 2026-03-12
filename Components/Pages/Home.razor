@@ -96,6 +96,9 @@
             // Base64 string below decodes to: "FLAG1: RECON_01"
             await JS.InvokeVoidAsync("printDebugBanner", "RkxBRzE6IFJFQ09OXzAx");
             await JS.InvokeVoidAsync("setCookie", "customer_tier", "standard", 7);
+            // FLAG 10: LOCALSTORAGE_10 — stored in localStorage as a debug session token
+            // Base64 decodes to: "FLAG10: LOCALSTORAGE_10"
+            await JS.InvokeVoidAsync("setLocalStorage", "th_debug_token", "RkxBRzEwOiBMT0NBTFNUT1JBR0VfMTA=");
         }
     }
 }

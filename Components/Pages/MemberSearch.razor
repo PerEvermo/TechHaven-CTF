@@ -1,0 +1,125 @@
+@page "/community"
+@rendermode InteractiveServer
+@inject DatabaseService Db
+
+<PageTitle>Community — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="fw-bold mb-2">TechHaven Community</h1>
+            <p class="text-muted lead">Connect with fellow tech enthusiasts and hardware fans.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3">&#x1F50E; Find a Member</h5>
+                <!-- TODO: sanitize input before passing to LIKE query -->
+                <!-- Debug: SELECT id, username, badge FROM community_members WHERE username LIKE '%query%' -->
+                <div class="input-group">
+                    <input @bind="searchQuery"
+                           @bind:event="oninput"
+                           @onkeydown="HandleKey"
+                           class="form-control"
+                           placeholder="Search by username…" />
+                    <button class="btn btn-primary" @onclick="Search">Search</button>
+                </div>
+
+                @if (errorMessage is not null)
+                {
+                    <div class="alert alert-danger mt-3 mb-0">Database error: @errorMessage</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (results is not null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                @if (results.Count == 0)
+                {
+                    <div class="alert alert-info text-center">No members found matching "<strong>@lastQuery</strong>".</div>
+                }
+                else
+                {
+                    <p class="text-muted mb-3">@results.Count result(s) for "<strong>@lastQuery</strong>"</p>
+                    <div class="row g-3">
+                        @foreach (var m in results)
+                        {
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm text-center p-3">
+                                    <div class="fs-2 mb-1">&#x1F464;</div>
+                                    <h6 class="fw-bold mb-1">@m.Username</h6>
+                                    <span class="badge bg-warning text-dark">@m.Badge</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (results is null)
+    {
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3 text-center">
+                <div class="card border-0 bg-light p-4">
+                    <div class="fs-1 mb-2">&#x1F9D1;&#x200D;&#x1F4BB;</div>
+                    <h6>TechWizard99</h6>
+                    <span class="badge bg-warning text-dark">Gold Member</span>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card border-0 bg-light p-4">
+                    <div class="fs-1 mb-2">&#x1F469;&#x200D;&#x1F527;</div>
+                    <h6>SolderQueen</h6>
+                    <span class="badge bg-secondary">Hardware Hero</span>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card border-0 bg-light p-4">
+                    <div class="fs-1 mb-2">&#x1F977;</div>
+                    <h6>ByteNinja</h6>
+                    <span class="badge bg-light text-dark border">Silver Member</span>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private string searchQuery = "";
+    private string? lastQuery;
+    private string? errorMessage;
+    private List<CommunityMemberResult>? results;
+
+    private void HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Search();
+    }
+
+    private void Search()
+    {
+        errorMessage = null;
+        lastQuery = searchQuery;
+
+        try
+        {
+            // FLAG 19: SQLUSERS_19 — LIKE injection
+            // Try: %   (returns all members including __system__ with the flag badge)
+            // Or:  ' OR '1'='1
+            results = Db.SearchMembersVulnerable(searchQuery);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            results = new();
+        }
+    }
+}

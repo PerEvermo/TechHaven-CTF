@@ -1,0 +1,67 @@
+@page "/product/{Id:int}"
+@inject DatabaseService Db
+@inject NavigationManager Nav
+
+<PageTitle>Product Details — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    @if (product is null)
+    {
+        <div class="text-center py-5">
+            <div class="display-1 mb-3">&#x1F50D;</div>
+            <h2 class="fw-bold">Product Not Found</h2>
+            <p class="text-muted">No product exists with ID <strong>@Id</strong>.</p>
+            <a href="/products" class="btn btn-primary mt-2">Back to Products</a>
+        </div>
+    }
+    else
+    {
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/products">Products</a></li>
+                <li class="breadcrumb-item active">@product.Name</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm p-5 text-center mb-4">
+                    <div class="display-1">&#x1F5A5;&#xFE0F;</div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="badge bg-secondary mb-2">@product.Category</span>
+                <h1 class="fw-bold mb-3">@product.Name</h1>
+                <p class="lead text-muted mb-4">@product.Description</p>
+
+                @if (product.Category != "DRAFT")
+                {
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <span class="price-tag fs-3">@product.Price.ToString("N2") kr</span>
+                    </div>
+                    <button class="btn btn-primary btn-lg px-5">Add to Cart</button>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <strong>&#x26A0; Unpublished Product</strong><br />
+                        This product is not yet listed in the public catalogue. You accessed it by guessing its ID directly.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ProductResult? product;
+
+    protected override void OnParametersSet()
+    {
+        // FLAG 12: IDOR_12 — no authorisation check here.
+        // Any product ID is served, including DRAFT products not shown in the listing.
+        product = Db.GetProductById(Id);
+    }
+}

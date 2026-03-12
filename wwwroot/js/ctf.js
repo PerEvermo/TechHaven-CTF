@@ -1,5 +1,6 @@
 // TechHaven Electronics — internal debug utilities
 // v2.3.1-dev
+// Dev note: session cache written to localStorage key "th_debug_token" on page load
 
 window.getCookie = function (name) {
     const value = `; ${document.cookie}`;
@@ -16,6 +17,10 @@ window.setCookie = function (name, value, days) {
         expires = "; expires=" + date.toUTCString();
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
+};
+
+window.setLocalStorage = function (key, value) {
+    localStorage.setItem(key, value);
 };
 
 window.printDebugBanner = function (encoded) {

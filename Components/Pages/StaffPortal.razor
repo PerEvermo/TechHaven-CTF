@@ -1,0 +1,68 @@
+@page "/staff-portal"
+@rendermode InteractiveServer
+@inject AuthStateService Auth
+@inject NavigationManager Nav
+
+<PageTitle>Staff Portal — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    @if (Auth.LoggedInRole != "staff")
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="display-1 text-danger mb-3">&#x26D4;</div>
+                <h2 class="fw-bold">Access Denied</h2>
+                <p class="text-muted">This portal is for TechHaven staff accounts only.</p>
+                <a href="/login" class="btn btn-primary mt-2">Go to Login</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-2">&#x1F464;</div>
+                            <div>
+                                <h5 class="fw-bold mb-0">@Auth.LoggedInUser</h5>
+                                <span class="badge bg-info text-dark">@Auth.LoggedInRole</span>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">Welcome to the TechHaven staff portal. You have limited access.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>FLAG20: ENUMERATE_20</strong><br />
+                    <small class="text-muted">
+                        You discovered this account by noticing the login page returns different error messages
+                        for "username not found" vs "wrong password" — a classic username enumeration vulnerability.
+                        Then you guessed or brute-forced the weak password.
+                    </small>
+                </div>
+
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3">Staff Quick Links</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Inventory System</span>
+                            <span class="badge bg-secondary">No access</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Order Management</span>
+                            <span class="badge bg-secondary">No access</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Customer Support</span>
+                            <span class="badge bg-success">Limited access</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>

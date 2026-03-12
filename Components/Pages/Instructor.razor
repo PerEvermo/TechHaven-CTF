@@ -124,13 +124,26 @@
 
     private static readonly Dictionary<string, string> FlagLabels = new()
     {
-        ["RECON_01"]     = "Flag 1 — Reconnaissance",
-        ["SHADOW_02"]    = "Flag 2 — Hidden Elements",
-        ["HEADER_03"]    = "Flag 3 — HTTP Headers",
-        ["WAREHOUSE_04"] = "Flag 4 — Robots.txt",
-        ["COOKIE_05"]    = "Flag 5 — Cookie Manipulation",
-        ["SQLINJECT_06"] = "Flag 6 — SQL Injection (Auth)",
-        ["UNION_07"]     = "Flag 7 — SQL Injection (UNION)",
+        ["RECON_01"]        = "Flag 1  — Reconnaissance (Console)",
+        ["SHADOW_02"]       = "Flag 2  — Hidden Element (DOM)",
+        ["HEADER_03"]       = "Flag 3  — HTTP Response Header",
+        ["WAREHOUSE_04"]    = "Flag 4  — Robots.txt Discovery",
+        ["COOKIE_05"]       = "Flag 5  — Cookie Manipulation",
+        ["COMMENT_08"]      = "Flag 8  — HTML Source Comment",
+        ["SITEMAP_09"]      = "Flag 9  — Sitemap Recon",
+        ["LOCALSTORAGE_10"] = "Flag 10 — Browser localStorage",
+        ["WELLKNOWN_11"]    = "Flag 11 — security.txt",
+        ["SQLINJECT_06"]    = "Flag 6  — SQLi Auth Bypass",
+        ["UNION_07"]        = "Flag 7  — SQLi UNION (Products)",
+        ["IDOR_12"]         = "Flag 12 — IDOR Product Detail",
+        ["APIDEBUG_13"]     = "Flag 13 — Exposed API Endpoint",
+        ["BACKUP_14"]       = "Flag 14 — Backup File",
+        ["APIKEY_15"]       = "Flag 15 — API Key Auth",
+        ["SQLCAT_16"]       = "Flag 16 — SQLi Category Filter",
+        ["SQLDISCOUNT_17"]  = "Flag 17 — SQLi Discount Code",
+        ["SQLFORGOT_18"]    = "Flag 18 — SQLi Forgot Password",
+        ["SQLUSERS_19"]     = "Flag 19 — SQLi Member Search",
+        ["ENUMERATE_20"]    = "Flag 20 — Username Enumeration",
     };
 
     private void HandleKey(KeyboardEventArgs e)

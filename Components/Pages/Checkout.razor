@@ -1,0 +1,108 @@
+@page "/checkout"
+@rendermode InteractiveServer
+@inject DatabaseService Db
+
+<PageTitle>Checkout — TechHaven Electronics</PageTitle>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <h2 class="fw-bold mb-1">Checkout</h2>
+            <p class="text-muted mb-4">Review your order and apply a discount code.</p>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted text-uppercase small mb-3">Order Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Laptop Pro X1</span>
+                        <span>999,99 kr</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 text-muted small">
+                        <span>Shipping</span>
+                        <span>Free</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total</span>
+                        <span>@totalDisplay</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Discount Code</h6>
+                    <!-- TODO: parameterize this query before launch -->
+                    <!-- Debug: SELECT code, discount_pct, description FROM promo_codes WHERE code = 'input' AND active = 1 -->
+                    <div class="input-group">
+                        <input @bind="couponCode" class="form-control" placeholder="Enter code (e.g. SAVE10)" />
+                        <button class="btn btn-outline-secondary" @onclick="ApplyCode">Apply</button>
+                    </div>
+
+                    @if (codeResults is not null)
+                    {
+                        @if (codeResults.Count > 0)
+                        {
+                            @foreach (var r in codeResults)
+                            {
+                                <div class="alert alert-success mt-2 mb-0 py-2">
+                                    <strong>@r.Code</strong> — @r.Description (@r.DiscountPct.ToString("0")% off)
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-danger mt-2 mb-0 py-2">Invalid or expired discount code.</div>
+                        }
+                    }
+                    @if (codeError is not null)
+                    {
+                        <div class="alert alert-danger mt-2 mb-0 py-2">Database error: @codeError</div>
+                    }
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100">Place Order</button>
+
+            <div class="ctf-hint mt-4">
+                <strong>Developer note:</strong> The discount code lookup queries the
+                <code>promo_codes</code> table. Only active codes should be returned.
+                Make sure the query is parameterized before going live.
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string couponCode = "";
+    private List<PromoCodeResult>? codeResults;
+    private string? codeError;
+    private string totalDisplay = "999,99 kr";
+
+    private void ApplyCode()
+    {
+        codeError = null;
+        codeResults = null;
+
+        if (string.IsNullOrWhiteSpace(couponCode)) return;
+
+        try
+        {
+            // FLAG 17: SQLDISCOUNT_17 — vulnerable to SQL injection
+            // Try: SAVE10' OR active=0 --   or   ' OR '1'='1' --
+            codeResults = Db.LookupPromoCodeVulnerable(couponCode);
+
+            if (codeResults.Count > 0)
+            {
+                var best = codeResults.Max(r => r.DiscountPct);
+                var discounted = 999.99 * (1 - best / 100.0);
+                totalDisplay = $"{discounted:N2} kr ({best:0}% off)";
+            }
+        }
+        catch (Exception ex)
+        {
+            codeError = ex.Message;
+        }
+    }
+}
