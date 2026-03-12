@@ -117,21 +117,29 @@
             return;
         }
 
-        var (isValid, description) = Flags.Validate(flagValue);
+        var result = Flags.Submit(teamName, flagValue);
 
-        if (isValid)
+        switch (result)
         {
-            Flags.Submit(teamName, flagValue);
-            submitMessage = $"Correct! \"{description}\" — flag captured!";
-            lastSubmitOk = true;
-            flagValue = "";
-            submissions = Flags.GetLeaderboard();
-        }
-        else
-        {
-            Flags.Submit(teamName, flagValue); // log incorrect attempts too
-            submitMessage = "Incorrect flag. Keep looking!";
-            lastSubmitOk = false;
+            case FlagService.SubmitResult.Correct:
+                var (_, description) = Flags.Validate(flagValue);
+                submitMessage = $"Correct! \"{description}\" — flag captured!";
+                lastSubmitOk = true;
+                flagValue = "";
+                submissions = Flags.GetLeaderboard();
+                break;
+            case FlagService.SubmitResult.Duplicate:
+                submitMessage = "You already submitted that flag!";
+                lastSubmitOk = false;
+                break;
+            case FlagService.SubmitResult.AlreadyComplete:
+                submitMessage = "Your team has already captured all flags!";
+                lastSubmitOk = false;
+                break;
+            default:
+                submitMessage = "Incorrect flag. Keep looking!";
+                lastSubmitOk = false;
+                break;
         }
     }
 

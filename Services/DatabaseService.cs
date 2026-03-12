@@ -482,6 +482,33 @@ public class DatabaseService
         return results;
     }
 
+    public bool HasTeamSubmittedFlag(string teamName, string flagValue)
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        conn.Open();
+        var cmd = conn.CreateCommand();
+        cmd.CommandText = """
+            SELECT COUNT(*) FROM submissions
+            WHERE team_name = @t AND flag_value = @f AND is_correct = 1
+        """;
+        cmd.Parameters.AddWithValue("@t", teamName);
+        cmd.Parameters.AddWithValue("@f", flagValue);
+        return (long)cmd.ExecuteScalar()! > 0;
+    }
+
+    public int GetTeamCorrectCount(string teamName)
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        conn.Open();
+        var cmd = conn.CreateCommand();
+        cmd.CommandText = """
+            SELECT COUNT(DISTINCT flag_value) FROM submissions
+            WHERE team_name = @t AND is_correct = 1
+        """;
+        cmd.Parameters.AddWithValue("@t", teamName);
+        return (int)(long)cmd.ExecuteScalar()!;
+    }
+
     public void AddSubmission(string teamName, string flagValue, bool isCorrect)
     {
         using var conn = new SqliteConnection(_connectionString);

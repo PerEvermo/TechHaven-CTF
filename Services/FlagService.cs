@@ -42,11 +42,23 @@ public class FlagService
         return (false, string.Empty);
     }
 
-    public bool Submit(string teamName, string flagValue)
+    public enum SubmitResult { Correct, Duplicate, AlreadyComplete, Invalid }
+
+    public SubmitResult Submit(string teamName, string flagValue)
     {
-        var (isValid, _) = Validate(flagValue);
-        _db.AddSubmission(teamName, flagValue.Trim().ToUpperInvariant(), isValid);
-        return isValid;
+        var normalized = flagValue.Trim().ToUpperInvariant();
+        var (isValid, _) = Validate(normalized);
+
+        if (isValid)
+        {
+            if (_db.HasTeamSubmittedFlag(teamName, normalized))
+                return SubmitResult.Duplicate;
+            if (_db.GetTeamCorrectCount(teamName) >= TotalFlags)
+                return SubmitResult.AlreadyComplete;
+        }
+
+        _db.AddSubmission(teamName, normalized, isValid);
+        return isValid ? SubmitResult.Correct : SubmitResult.Invalid;
     }
 
     public List<SubmissionResult> GetLeaderboard() => _db.GetCorrectSubmissions();
