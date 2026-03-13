@@ -114,6 +114,14 @@ public class DatabaseService
         cmd.CommandText = "UPDATE community_members SET username='__404__' WHERE username='__system__'";
         cmd.ExecuteNonQuery();
 
+        // Additive: insert ghost community member if missing (breadcrumb for flag 20)
+        cmd.CommandText = "SELECT COUNT(*) FROM community_members WHERE username='ghost'";
+        if ((long)cmd.ExecuteScalar()! == 0)
+        {
+            cmd.CommandText = "INSERT INTO community_members (username, badge, joined_date) VALUES ('ghost', 'Former Staff', '2021-08-14')";
+            cmd.ExecuteNonQuery();
+        }
+
         // Additive: insert ghost user if missing (safe parameterized query)
         cmd.CommandText = "SELECT COUNT(*) FROM users WHERE username = 'ghost'";
         if ((long)cmd.ExecuteScalar()! == 0)
@@ -242,6 +250,7 @@ public class DatabaseService
                 ('SolderQueen', 'Hardware Hero', '2022-11-05'),
                 ('ByteNinja', 'Silver Member', '2024-01-20'),
                 ('Erik_H', 'Founder', '2018-06-01'),
+                ('ghost', 'Former Staff', '2021-08-14'),
                 ('__404__', 'SQLUSERS_19 — You enumerated our member database via SQL injection on the community search!', '2000-01-01');
         """;
         cmd.ExecuteNonQuery();
