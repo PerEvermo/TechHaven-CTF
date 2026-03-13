@@ -134,8 +134,9 @@ SecretWebsite/
 │   │   ├── MemberSearch.razor      # Flag 19 — community member SQLi
 │   │   ├── Scoreboard.razor        # Flag submission + leaderboard
 │   │   └── Instructor.razor        # Password-protected instructor panel
+│   ├── App.razor                   # Document shell — Flag 8 (HTML comment before </body>)
 │   └── Layout/
-│       └── MainLayout.razor        # Navbar (Flag 8 — HTML comment in footer)
+│       └── MainLayout.razor        # Navbar + footer
 ├── Services/
 │   ├── DatabaseService.cs          # All DB logic — vulnerable + patched queries
 │   ├── AuthStateService.cs         # Per-circuit login state
@@ -145,6 +146,7 @@ SecretWebsite/
 │   ├── sitemap.xml                 # Lists /changelog (Flag 9)
 │   ├── security.txt                # Flag 11 — security disclosure file
 │   ├── backup/
+│   │   ├── index.txt               # Fake directory listing — hints at config.txt
 │   │   └── config.txt              # Flag 14 — exposed backup config + API key
 │   └── js/ctf.js                   # Cookie + localStorage JS helpers
 ├── Program.cs                      # HTTP header middleware (Flag 3)
@@ -333,11 +335,14 @@ A result card appears showing the flag value and hint text extracted from the `f
 **Category:** HTML Source Comment
 **Difficulty:** ⭐
 
-Right-click any page → *View Page Source* (`Ctrl+U`). Scroll to the bottom and find the comment just before the `<footer>` tag:
+Right-click any page → *View Page Source* (`Ctrl+U`). Scroll to the very bottom and find the comment just before the closing `</body>` tag:
 
 ```html
 <!-- internal build notes: flag=COMMENT_08 | branch=release/2.3 | remove before deploy! -->
+</body>
 ```
+
+> **Note:** This comment is in the `<body>` section, not in the `<footer>` element — look past the footer markup.
 
 **Teaching moment:** Developer notes in HTML source are visible to anyone — never leave credentials, flags, or internal notes in HTML comments.
 
@@ -446,9 +451,19 @@ Browse or `curl` to `/api/debug`. The endpoint returns a JSON object:
 **Category:** Force Browsing / Exposed Backup
 **Difficulty:** ⭐⭐
 
-Browse directly to `/backup/config.txt`. This file was left in the `wwwroot` folder — it's not linked anywhere but is publicly accessible.
+**Step 1 — Discover the backup path:**
 
-The file contains fake internal configuration including an API key, SMTP credentials, and the flag:
+`/robots.txt` (from Flag 4) lists `/backup` as a disallowed path. Browse to `/backup/index.txt` to find a fake directory listing:
+
+```
+Files:
+  - config.txt        [2026-01-15]  internal configuration snapshot
+  ...
+```
+
+**Step 2 — Fetch the file:**
+
+Browse to `/backup/config.txt`. The file contains fake internal configuration including an API key, SMTP credentials, and the flag:
 ```
 # FLAG14: BACKUP_14
 ```
@@ -576,7 +591,7 @@ The community member search uses a `LIKE '%query%'` pattern. Hint in page source
 ```
 %
 ```
-This matches all usernames, returning every member including the hidden `__system__` account whose badge field contains the flag.
+This matches all usernames, returning every member including the hidden `__404__` account whose badge field contains the flag.
 
 **Alternative injection:**
 ```
@@ -599,15 +614,26 @@ The login page now returns **different error messages** depending on whether the
 | Username doesn't exist | *"No account found with that username."* |
 | Username exists, wrong password | *"Incorrect password."* |
 
-**Step 1 — Enumerate valid usernames:**
+**Step 1 — Find the username:**
 
-Try various usernames. Notice that `johndoe`, `admin`, and `ghost` return *"Incorrect password."*, while made-up names return *"No account found."*
+Visit `/community` — the member cards show a user named `ghost` with a *"Former Staff"* badge. This is the username to target.
 
-**Step 2 — Crack the weak password:**
+**Step 2 — Enumerate via login errors:**
+
+Try logging in with `ghost` and a wrong password. The login page returns different errors depending on whether the username exists:
+
+| Scenario | Error message |
+|----------|---------------|
+| Username doesn't exist | *"No account found with that username."* |
+| Username exists, wrong password | *"Incorrect password."* |
+
+`ghost` returns *"Incorrect password."* — confirming the account exists.
+
+**Step 3 — Crack the weak password:**
 
 The `ghost` account uses the password `ghost123` — trivially guessable with common passwords or a short wordlist.
 
-**Step 3 — Log in:**
+**Step 4 — Log in:**
 
 Log in as `ghost` / `ghost123`. Because the role is `staff`, the app redirects to `/staff-portal` instead of `/admin`, where the flag is displayed.
 
