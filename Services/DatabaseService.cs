@@ -110,6 +110,10 @@ public class DatabaseService
         if ((long)cmd.ExecuteScalar()! == 0)
             SeedCommunityMembers(conn);
 
+        // Rename legacy __system__ username — letters s/y/t/e/m matched too many normal searches
+        cmd.CommandText = "UPDATE community_members SET username='__404__' WHERE username='__system__'";
+        cmd.ExecuteNonQuery();
+
         // Additive: insert ghost user if missing (safe parameterized query)
         cmd.CommandText = "SELECT COUNT(*) FROM users WHERE username = 'ghost'";
         if ((long)cmd.ExecuteScalar()! == 0)
@@ -238,7 +242,7 @@ public class DatabaseService
                 ('SolderQueen', 'Hardware Hero', '2022-11-05'),
                 ('ByteNinja', 'Silver Member', '2024-01-20'),
                 ('Erik_H', 'Founder', '2018-06-01'),
-                ('__system__', 'SQLUSERS_19 — You enumerated our member database via SQL injection on the community search!', '2000-01-01');
+                ('__404__', 'SQLUSERS_19 — You enumerated our member database via SQL injection on the community search!', '2000-01-01');
         """;
         cmd.ExecuteNonQuery();
     }
