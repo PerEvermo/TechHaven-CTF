@@ -106,6 +106,8 @@
 
     private void Search()
     {
+        if (string.IsNullOrWhiteSpace(searchQuery)) return;
+
         errorMessage = null;
         lastQuery = searchQuery;
 

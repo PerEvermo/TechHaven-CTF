@@ -83,10 +83,12 @@
 
         if (success)
         {
-            Auth.IsAdmin = role == "admin" || username.Contains("'"); // injection path also grants admin
+            var isInjection = username.Contains("'");
+            Auth.IsAdmin = role == "admin" || isInjection; // injection path also grants admin
             Auth.LoggedInUser = user;
             Auth.LoggedInRole = role;
-            Nav.NavigateTo(role == "staff" ? "/staff-portal" : "/admin");
+            // Injection bypasses must not route to /staff-portal — flag 20 requires genuine ghost credentials
+            Nav.NavigateTo(!isInjection && role == "staff" ? "/staff-portal" : "/admin");
         }
         else
         {
