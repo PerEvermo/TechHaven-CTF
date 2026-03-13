@@ -1,0 +1,8 @@
+TechHaven Backup Storage
+========================
+Last sync: 2026-01-15 03:12:44 UTC
+
+Files:
+  - config.txt        [2026-01-15]  internal configuration snapshot
+  - db_schema.sql     [2025-11-02]  database schema export (archived)
+  - deploy_notes.txt  [2025-09-18]  deployment notes (archived)
