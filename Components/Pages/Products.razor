@@ -14,8 +14,8 @@
                        class="form-control form-control-lg"
                        placeholder="Search products…"
                        autocomplete="off" />
-                <!-- TODO: sanitize search input before passing to DB query -->
-                <!-- Debug: query = SELECT id, name, description, price, category FROM products WHERE name LIKE '%query%' -->
+                @((MarkupString)"<!-- TODO: sanitize search input before passing to DB query -->")
+                @((MarkupString)"<!-- Debug: query = SELECT id, name, description, price, category FROM products WHERE name LIKE '%query%' -->")
             </div>
             <div class="col-md-2">
                 <button class="btn btn-primary btn-lg w-100" @onclick="Search">Search</button>

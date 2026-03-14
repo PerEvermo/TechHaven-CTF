@@ -17,8 +17,8 @@
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm p-4">
                 <h5 class="fw-bold mb-3">&#x1F50E; Find a Member</h5>
-                <!-- TODO: sanitize input before passing to LIKE query -->
-                <!-- Debug: SELECT id, username, badge FROM community_members WHERE username LIKE '%query%' -->
+                @((MarkupString)"<!-- TODO: sanitize input before passing to LIKE query -->")
+                @((MarkupString)"<!-- Debug: SELECT id, username, badge FROM community_members WHERE username LIKE '%query%' -->")
                 <div class="input-group">
                     <input @bind="searchQuery"
                            @bind:event="oninput"

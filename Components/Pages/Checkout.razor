@@ -33,8 +33,8 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h6 class="fw-bold mb-3">Discount Code</h6>
-                    <!-- TODO: parameterize this query before launch -->
-                    <!-- Debug: SELECT code, discount_pct, description FROM promo_codes WHERE code = 'input' AND active = 1 -->
+                    @((MarkupString)"<!-- TODO: parameterize this query before launch -->")
+                    @((MarkupString)"<!-- Debug: SELECT code, discount_pct, description FROM promo_codes WHERE code = 'input' AND active = 1 -->")
                     <div class="input-group">
                         <input @bind="couponCode" class="form-control" placeholder="Enter code (e.g. SAVE10)" />
                         <button class="btn btn-outline-secondary" @onclick="ApplyCode">Apply</button>
