@@ -2,7 +2,7 @@
 
 A deliberately vulnerable fake electronics webshop built with **Blazor Web App (.NET 10)** and **SQLite**, designed as a Capture The Flag (CTF) platform for cybersecurity workshops.
 
-Students attack the site as if it were a real target. **20 flags** are hidden across the application using techniques ranging from basic source inspection to multi-step SQL injection.
+Students attack the site as if it were a real target. **21 flags** are hidden across the application using techniques ranging from basic source inspection to multi-step SQL injection.
 
 ---
 
@@ -132,6 +132,7 @@ SecretWebsite/
 │   │   ├── HiddenWarehouse.razor   # Flag 4 — robots.txt discovery
 │   │   ├── Changelog.razor         # Flag 9 — sitemap discovery
 │   │   ├── MemberSearch.razor      # Flag 19 — community member SQLi
+│   │   ├── Support.razor           # Flag 21 — accidental console.log in production
 │   │   ├── Scoreboard.razor        # Flag submission + leaderboard
 │   │   └── Instructor.razor        # Password-protected instructor panel
 │   ├── App.razor                   # Document shell — Flag 8 (HTML comment before </body>)
@@ -140,7 +141,7 @@ SecretWebsite/
 ├── Services/
 │   ├── DatabaseService.cs          # All DB logic — vulnerable + patched queries
 │   ├── AuthStateService.cs         # Per-circuit login state
-│   └── FlagService.cs              # Flag registry and validation (20 flags)
+│   └── FlagService.cs              # Flag registry and validation (21 flags)
 ├── wwwroot/
 │   ├── robots.txt                  # Hints at hidden paths (Flag 4)
 │   ├── sitemap.xml                 # Lists /changelog (Flag 9)
@@ -149,6 +150,7 @@ SecretWebsite/
 │   │   ├── index.txt               # Fake directory listing — hints at config.txt
 │   │   └── config.txt              # Flag 14 — exposed backup config + API key
 │   └── js/ctf.js                   # Cookie + localStorage JS helpers
+│                                   # printSupportDebug() — Flag 21
 ├── Program.cs                      # HTTP header middleware (Flag 3)
 │                                   # /api/debug (Flag 13), /api/internal (Flag 15)
 └── README.md
@@ -158,7 +160,7 @@ SecretWebsite/
 
 ## The CTF Challenges — Overview
 
-> **Tell students:** "TechHaven Electronics has **20 security flags** hidden across the site. Find them, note down the value, and submit on the Scoreboard page."
+> **Tell students:** "TechHaven Electronics has **21 security flags** hidden across the site. Find them, note down the value, and submit on the Scoreboard page."
 
 | # | Flag Value | Category | Difficulty |
 |---|-----------|----------|-----------|
@@ -182,6 +184,7 @@ SecretWebsite/
 | 18 | `SQLFORGOT_18` | SQL Injection (Forgot Password) | ⭐⭐⭐ Hard |
 | 19 | `SQLUSERS_19` | SQL Injection (Member Search) | ⭐⭐⭐ Hard |
 | 20 | `ENUMERATE_20` | Username Enumeration + Weak Creds | ⭐⭐⭐⭐ Expert |
+| 21 | `CONSOLELOG_21` | Accidental Console Log | ⭐ Easy |
 
 ---
 
@@ -640,6 +643,25 @@ Log in as `ghost` / `ghost123`. Because the role is `staff`, the app redirects t
 **Teaching moment:** Different error messages for "user not found" vs "wrong password" allow an attacker to enumerate valid account names. Combined with weak passwords, this is a complete account takeover chain.
 
 **Submit:** `ENUMERATE_20`
+
+---
+
+### FLAG 21 — CONSOLELOG_21
+**Page:** `/support`
+**Category:** Accidental Console Log in Production
+**Difficulty:** ⭐
+
+Navigate to `/support` (linked in the navbar as **Support**). The page is a standard customer help centre — FAQs and contact details.
+
+Open DevTools → **Console** tab. On page load the app prints a styled debug message that a developer accidentally left behind:
+
+```
+[Support::init]  Ticket system ready. debug_token=CONSOLELOG_21
+```
+
+**Teaching moment:** `console.log()` calls ship to the browser in production just like any other JavaScript. Developers often leave debug output in place thinking "no one will notice" — but anyone with DevTools open will see it immediately.
+
+**Submit:** `CONSOLELOG_21`
 
 ---
 

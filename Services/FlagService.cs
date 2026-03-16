@@ -30,6 +30,7 @@ public class FlagService
         ["SQLUSERS_19"]    = "Flag 19 — SQL Injection on Member Search",
         // Advanced
         ["ENUMERATE_20"]   = "Flag 20 — Username Enumeration + Weak Credentials",
+        ["CONSOLELOG_21"]  = "Flag 21 — Accidental Console Log in Production",
     };
 
     public FlagService(DatabaseService db) => _db = db;

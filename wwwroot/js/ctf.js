@@ -23,6 +23,14 @@ window.setLocalStorage = function (key, value) {
     localStorage.setItem(key, value);
 };
 
+window.printSupportDebug = function (token) {
+    console.log(
+        "%c[Support::init] %cTicket system ready. debug_token=" + token,
+        "color:#3498db;font-weight:bold;font-family:monospace;",
+        "color:#ecf0f1;font-family:monospace;"
+    );
+};
+
 window.printDebugBanner = function (encoded) {
     console.log(
         "%c[TechHaven Debug] %c" + encoded,
